@@ -82,12 +82,14 @@ button:hover {
     padding: 12px;
     border-radius: 10px;
     background: #fff8df;
+    line-height: 1.5;
 }
 
 #goalMessage {
     padding: 12px;
     border-radius: 10px;
     background: #eefbf3;
+    line-height: 1.5;
 }
 
 ul {
@@ -119,7 +121,6 @@ li button {
 canvas {
     max-width: 100%;
 }
-
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -139,7 +140,7 @@ Smartly manage your daily expenses, budget and savings.
 
 <div class="card">
 
-<h2>My Budget</h2>
+<h2>💰 My Budget</h2>
 
 <input type="number" id="budget" placeholder="Enter your budget">
 
@@ -374,7 +375,8 @@ let alertBox = document.getElementById("budgetAlert");
 
 if (budget <= 0) {
 
-alertBox.textContent = "💰 Please set your budget.";
+alertBox.textContent =
+"💰 Please set your budget.";
 
 }
 
@@ -433,26 +435,59 @@ list.appendChild(item);
 });
 
 
+/* 🤖 Smart Personalized Recommendation */
+
 if (budget <= 0) {
 
 document.getElementById("suggestion").textContent =
-"💡 Set a budget to get smart saving suggestions.";
+"🤖 Smart Suggestion: Set a budget first to receive personalized spending advice.";
 
 }
 
 else if (remaining < 0) {
 
 document.getElementById("suggestion").textContent =
-"⚠️ You have exceeded your budget.";
+"🚨 Smart Alert: Your spending is above your budget. Try reducing unnecessary expenses.";
+
+}
+
+else {
+
+let percentage = (totalSpent / budget) * 100;
+
+if (percentage >= 80) {
+
+document.getElementById("suggestion").textContent =
+"🤖 Smart Suggestion: You have used " +
+Math.round(percentage) +
+"% of your budget. Try to limit extra spending and focus on essential expenses.";
+
+}
+
+else if (percentage >= 50) {
+
+document.getElementById("suggestion").textContent =
+"🤖 Smart Suggestion: You have used " +
+Math.round(percentage) +
+"% of your budget. Keep tracking your expenses to stay on budget.";
+
+}
+
+else if (expenses.length > 0) {
+
+document.getElementById("suggestion").textContent =
+"🤖 Smart Suggestion: Your spending is under control. You have Rs. " +
+remaining +
+" remaining. Consider saving part of it.";
 
 }
 
 else {
 
 document.getElementById("suggestion").textContent =
-"💡 You have Rs. " +
-remaining +
-" remaining. Keep saving!";
+"🤖 Smart Suggestion: Start adding your expenses to receive personalized spending advice.";
+
+}
 
 }
 
