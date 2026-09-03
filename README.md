@@ -4,7 +4,7 @@ AI Budget Buddy is a simple and smart web application that helps users manage th
 
 ## 🚀 Live Demo
 
-https://sehar-shahzadi879.github.io/
+*https://sehar-shahzadi879.github.io/AI-Budget--Buddy/*
 
 ## 🎯 Problem
 
