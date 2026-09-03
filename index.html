@@ -1,79 +1,87 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html>
 <head>
     <title>AI Budget Buddy</title>
     <link rel="stylesheet" href="style.css">
-</head><body><div class="container"><h1>💰 AI Budget Buddy</h1>
 
-<p class="subtitle">
-    Smartly manage your daily expenses, budget and savings.
-</p>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
 
-<div class="card">
+<body>
 
-    <h2>My Budget</h2>
+<div class="container">
 
-    <input
-        type="number"
-        id="budget"
-        placeholder="Enter your budget"
-    >
+    <h1>💰 AI Budget Buddy</h1>
 
-    <button onclick="setBudget()">Set Budget</button>
+    <p class="subtitle">
+        Smartly manage your daily expenses, budget and savings.
+    </p>
 
-    <div class="summary">
+    <div class="card">
 
-        <p>
-            Budget:
-            <strong>Rs. <span id="budgetAmount">0</span></strong>
-        </p>
+        <h2>My Budget</h2>
 
-        <p>
-            Spent:
-            <strong>Rs. <span id="totalSpent">0</span></strong>
-        </p>
+        <input type="number" id="budget" placeholder="Enter your budget">
 
-        <p>
-            Remaining:
-            <strong>Rs. <span id="remaining">0</span></strong>
-        </p>
+        <button onclick="setBudget()">Set Budget</button>
+
+        <div class="summary">
+
+            <p>Budget:
+                <strong>Rs. <span id="budgetAmount">0</span></strong>
+            </p>
+
+            <p>Spent:
+                <strong>Rs. <span id="totalSpent">0</span></strong>
+            </p>
+
+            <p>Remaining:
+                <strong>Rs. <span id="remaining">0</span></strong>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Daily Expense Tracker</h2>
+
+        <input type="number" id="expense" placeholder="Enter amount">
+
+        <input type="text" id="category" placeholder="Food, Travel, etc.">
+
+        <button onclick="addExpense()">Add Expense</button>
+
+        <h3>My Expenses</h3>
+
+        <ul id="expenseList"></ul>
+
+        <div id="suggestion" class="suggestion"></div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>📊 Expense Chart</h2>
+
+        <canvas id="expenseChart"></canvas>
 
     </div>
 
 </div>
 
 
-<div class="card">
-
-    <h2>Daily Expense Tracker</h2>
-
-    <input
-        type="number"
-        id="expense"
-        placeholder="Enter amount"
-    >
-
-    <input
-        type="text"
-        id="category"
-        placeholder="Food, Travel, etc."
-    >
-
-    <button onclick="addExpense()">Add Expense</button>
-
-    <h3>My Expenses</h3>
-
-    <ul id="expenseList"></ul>
-
-    <div id="suggestion" class="suggestion"></div>
-
-</div>
-
-</div><script>
+<script>
 
 let budget = Number(localStorage.getItem("budget")) || 0;
 
 let expenses =
     JSON.parse(localStorage.getItem("expenses")) || [];
+
+let expenseChart;
 
 
 function saveData() {
@@ -120,9 +128,7 @@ function addExpense() {
 
     if (amount <= 0 || category === "") {
 
-        alert(
-            "Please enter expense amount and category."
-        );
+        alert("Please enter expense amount and category.");
 
         return;
     }
@@ -215,6 +221,72 @@ function showSuggestion() {
 }
 
 
+function updateChart() {
+
+    const categoryTotals = {};
+
+
+    expenses.forEach(function(expense) {
+
+        if (categoryTotals[expense.category]) {
+
+            categoryTotals[expense.category] += expense.amount;
+
+        } else {
+
+            categoryTotals[expense.category] =
+                expense.amount;
+
+        }
+
+    });
+
+
+    const labels =
+        Object.keys(categoryTotals);
+
+    const data =
+        Object.values(categoryTotals);
+
+
+    const ctx =
+        document.getElementById("expenseChart");
+
+
+    if (expenseChart) {
+
+        expenseChart.destroy();
+
+    }
+
+
+    expenseChart = new Chart(ctx, {
+
+        type: "doughnut",
+
+        data: {
+
+            labels: labels,
+
+            datasets: [{
+
+                data: data
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true
+
+        }
+
+    });
+
+}
+
+
 function updateScreen() {
 
     document.getElementById("budgetAmount").textContent =
@@ -271,6 +343,8 @@ function updateScreen() {
 
     showSuggestion();
 
+    updateChart();
+
 }
 
 
@@ -280,5 +354,7 @@ document.getElementById("budget").value =
 
 updateScreen();
 
-</script></body>
+</script>
+
+</body>
 </html>
