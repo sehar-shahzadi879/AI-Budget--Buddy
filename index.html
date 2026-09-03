@@ -1,9 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI Budget Buddy</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>AI Budget Buddy</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    color: white;
+    font-size: 32px;
+}
+
+.subtitle {
+    text-align: center;
+    color: white;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    margin-bottom: 20px;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+}
+
+h2 {
+    color: #333;
+}
+
+input {
+    width: 100%;
+    padding: 13px;
+    margin: 6px 0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 13px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 10px;
+    background: #667eea;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#budgetAlert {
+    padding: 12px;
+    border-radius: 10px;
+    background: #eef2ff;
+    text-align: center;
+}
+
+#suggestion {
+    padding: 12px;
+    border-radius: 10px;
+    background: #fff8df;
+}
+
+#goalMessage {
+    padding: 12px;
+    border-radius: 10px;
+    background: #eefbf3;
+}
+
+ul {
+    padding: 0;
+    list-style: none;
+}
+
+li {
+    background: #f5f5f5;
+    margin: 8px 0;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+li button {
+    width: auto;
+    padding: 7px 12px;
+    margin-left: 10px;
+}
+
+canvas {
+    max-width: 100%;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
@@ -50,7 +156,7 @@ Smartly manage your daily expenses, budget and savings.
 
 <div class="card">
 
-<h2>Daily Expense Tracker</h2>
+<h2>💸 Daily Expense Tracker</h2>
 
 <input type="number" id="expense" placeholder="Enter amount">
 
@@ -91,326 +197,202 @@ let expenseChart = null;
 
 function saveData() {
 
-    localStorage.setItem("budget", budget);
+localStorage.setItem("budget", budget);
 
-    localStorage.setItem("expenses", JSON.stringify(expenses));
+localStorage.setItem("expenses", JSON.stringify(expenses));
 
-    localStorage.setItem("savingsGoal", savingsGoal);
+localStorage.setItem("savingsGoal", savingsGoal);
 
 }
 
 
 function setBudget() {
 
-    let value = Number(document.getElementById("budget").value);
+let value = Number(document.getElementById("budget").value);
 
-    if (value <= 0) {
+if (value <= 0) {
 
-        alert("Please enter a valid budget.");
+alert("Please enter a valid budget.");
 
-        return;
+return;
 
-    }
+}
 
-    budget = value;
+budget = value;
 
-    saveData();
+saveData();
 
-    updateScreen();
+updateScreen();
 
 }
 
 
 function setSavingsGoal() {
 
-    let value = Number(document.getElementById("savingsGoal").value);
+let value = Number(document.getElementById("savingsGoal").value);
 
-    if (value <= 0) {
+if (value <= 0) {
 
-        alert("Please enter a valid savings goal.");
+alert("Please enter a valid savings goal.");
 
-        return;
+return;
 
-    }
+}
 
-    savingsGoal = value;
+savingsGoal = value;
 
-    saveData();
+saveData();
 
-    updateScreen();
+updateScreen();
 
 }
 
 
 function addExpense() {
 
-    let amount = Number(document.getElementById("expense").value);
+let amount = Number(document.getElementById("expense").value);
 
-    let category = document.getElementById("category").value.trim();
+let category = document.getElementById("category").value.trim();
 
-    if (amount <= 0 || category === "") {
+if (amount <= 0 || category === "") {
 
-        alert("Please enter expense amount and category.");
+alert("Please enter expense amount and category.");
 
-        return;
+return;
 
-    }
+}
 
-    expenses.push({
+expenses.push({
 
-        amount: amount,
+amount: amount,
 
-        category: category
+category: category
 
-    });
+});
 
-    saveData();
+saveData();
 
-    document.getElementById("expense").value = "";
+document.getElementById("expense").value = "";
 
-    document.getElementById("category").value = "";
+document.getElementById("category").value = "";
 
-    updateScreen();
+updateScreen();
 
 }
 
 
 function deleteExpense(index) {
 
-    expenses.splice(index, 1);
+expenses.splice(index, 1);
 
-    saveData();
+saveData();
 
-    updateScreen();
+updateScreen();
 
 }
 
 
 function updateScreen() {
 
-    document.getElementById("budgetAmount").textContent = budget;
+document.getElementById("budgetAmount").textContent = budget;
+
+let totalSpent = 0;
+
+expenses.forEach(function(expense) {
+
+totalSpent += expense.amount;
+
+});
+
+document.getElementById("totalSpent").textContent = totalSpent;
+
+let remaining = budget - totalSpent;
+
+document.getElementById("remaining").textContent = remaining;
 
 
-    let totalSpent = 0;
+let alertBox = document.getElementById("budgetAlert");
 
-    expenses.forEach(function(expense) {
+if (budget <= 0) {
 
-        totalSpent += expense.amount;
+alertBox.textContent = "💰 Please set your budget.";
 
-    });
+}
 
+else {
 
-    document.getElementById("totalSpent").textContent = totalSpent;
+let percentage = (totalSpent / budget) * 100;
 
+if (percentage > 100) {
 
-    let remaining = budget - totalSpent;
+alertBox.textContent =
+"🚨 Budget exceeded! Please reduce your spending.";
 
-    document.getElementById("remaining").textContent = remaining;
+}
 
+else if (percentage >= 80) {
 
-    // BUDGET ALERT
+alertBox.textContent =
+"⚠️ Warning! You have used " +
+Math.round(percentage) +
+"% of your budget.";
 
-    let alertBox = document.getElementById("budgetAlert");
+}
 
-    if (budget <= 0) {
+else {
 
-        alertBox.textContent = "💰 Please set your budget.";
+alertBox.textContent =
+"✅ You're on track! You have used " +
+Math.round(percentage) +
+"% of your budget.";
 
-    }
-
-    else {
-
-        let percentage = (totalSpent / budget) * 100;
-
-        if (percentage > 100) {
-
-            alertBox.textContent =
-            "🚨 Budget exceeded! Please reduce your spending.";
-
-        }
-
-        else if (percentage >= 80) {
-
-            alertBox.textContent =
-            "⚠️ Warning! You have used " +
-            Math.round(percentage) +
-            "% of your budget.";
-
-        }
-
-        else {
-
-            alertBox.textContent =
-            "✅ You're on track! You have used " +
-            Math.round(percentage) +
-            "% of your budget.";
-
-        }
-
-    }
-
-
-    // EXPENSE LIST
-
-    let list = document.getElementById("expenseList");
-
-    list.innerHTML = "";
-
-
-    expenses.forEach(function(expense, index) {
-
-        let item = document.createElement("li");
-
-        item.innerHTML =
-        expense.category +
-        " - Rs. " +
-        expense.amount +
-        ' <button onclick="deleteExpense(' +
-        index +
-        ')">Delete</button>';
-
-        list.appendChild(item);
-
-    });
-
-
-    // SMART SUGGESTION
-
-    if (budget <= 0) {
-
-        document.getElementById("suggestion").textContent =
-        "💡 Set a budget to get smart saving suggestions.";
-
-    }
-
-    else if (remaining < 0) {
-
-        document.getElementById("suggestion").textContent =
-        "⚠️ You have exceeded your budget. Try to reduce unnecessary expenses.";
-
-    }
-
-    else {
-
-        document.getElementById("suggestion").textContent =
-        "💡 You have Rs. " +
-        remaining +
-        " remaining. Keep saving!";
-
-    }
-
-
-    // SAVINGS GOAL
-
-    if (savingsGoal <= 0) {
-
-        document.getElementById("goalMessage").textContent =
-        "No savings goal set yet.";
-
-    }
-
-    else if (remaining >= savingsGoal) {
-
-        document.getElementById("goalMessage").textContent =
-        "🎉 Great! You can reach your savings goal of Rs. " +
-        savingsGoal +
-        ".";
-
-    }
-
-    else {
-
-        document.getElementById("goalMessage").textContent =
-        "🎯 Savings Goal: Rs. " +
-        savingsGoal +
-        ". You need more savings to reach it.";
-
-    }
-
-
-    updateChart();
+}
 
 }
 
 
-function updateChart() {
+let list = document.getElementById("expenseList");
 
-    let totals = {};
+list.innerHTML = "";
 
+expenses.forEach(function(expense, index) {
 
-    expenses.forEach(function(expense) {
+let item = document.createElement("li");
 
-        if (totals[expense.category]) {
+item.innerHTML =
+expense.category +
+" - Rs. " +
+expense.amount +
+' <button onclick="deleteExpense(' +
+index +
+')">Delete</button>';
 
-            totals[expense.category] += expense.amount;
+list.appendChild(item);
 
-        }
-
-        else {
-
-            totals[expense.category] = expense.amount;
-
-        }
-
-    });
-
-
-    let labels = Object.keys(totals);
-
-    let data = Object.values(totals);
+});
 
 
-    let ctx = document.getElementById("expenseChart");
+if (budget <= 0) {
 
+document.getElementById("suggestion").textContent =
+"💡 Set a budget to get smart saving suggestions.";
 
-    if (expenseChart) {
+}
 
-        expenseChart.destroy();
+else if (remaining < 0) {
 
-    }
+document.getElementById("suggestion").textContent =
+"⚠️ You have exceeded your budget.";
 
+}
 
-    if (labels.length === 0) {
+else {
 
-        return;
-
-    }
-
-
-    expenseChart = new Chart(ctx, {
-
-        type: "doughnut",
-
-        data: {
-
-            labels: labels,
-
-            datasets: [{
-
-                data: data
-
-            }]
-
-        },
-
-        options: {
-
-            responsive: true
-
-        }
-
-    });
+document.getElementById("suggestion").textContent =
+"💡 You have Rs. " +
+remaining +
+" remaining. Keep saving!";
 
 }
 
 
-document.getElementById("budget").value = budget || "";
-
-document.getElementById("savingsGoal").value = savingsGoal || "";
-
-updateScreen();
-
-</script>
-
-</body>
-</html>
