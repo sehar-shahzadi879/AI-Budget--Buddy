@@ -64,6 +64,11 @@ button {
     color: white;
     font-size: 16px;
     font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
 }
 
 #budgetAlert {
@@ -95,17 +100,26 @@ li {
     margin: 8px 0;
     padding: 12px;
     border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 li button {
     width: auto;
+    margin: 0;
     padding: 7px 12px;
-    margin-left: 10px;
+    font-size: 13px;
+}
+
+.reset-button {
+    background: #e74c3c;
 }
 
 canvas {
     max-width: 100%;
 }
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -121,6 +135,7 @@ canvas {
 <p class="subtitle">
 Smartly manage your daily expenses, budget and savings.
 </p>
+
 
 <div class="card">
 
@@ -178,6 +193,17 @@ Smartly manage your daily expenses, budget and savings.
 <h2>📊 Expense Chart</h2>
 
 <canvas id="expenseChart"></canvas>
+
+</div>
+
+
+<div class="card">
+
+<h2>⚙️ App Controls</h2>
+
+<button class="reset-button" onclick="resetData()">
+🗑️ Reset All Data
+</button>
 
 </div>
 
@@ -292,9 +318,39 @@ updateScreen();
 }
 
 
+function resetData() {
+
+let confirmReset = confirm(
+"Are you sure you want to delete all budget, expense and savings data?"
+);
+
+if (!confirmReset) {
+
+return;
+
+}
+
+budget = 0;
+
+expenses = [];
+
+savingsGoal = 0;
+
+saveData();
+
+document.getElementById("budget").value = "";
+
+document.getElementById("savingsGoal").value = "";
+
+updateScreen();
+
+}
+
+
 function updateScreen() {
 
 document.getElementById("budgetAmount").textContent = budget;
+
 
 let totalSpent = 0;
 
@@ -304,7 +360,9 @@ totalSpent += expense.amount;
 
 });
 
+
 document.getElementById("totalSpent").textContent = totalSpent;
+
 
 let remaining = budget - totalSpent;
 
@@ -312,6 +370,7 @@ document.getElementById("remaining").textContent = remaining;
 
 
 let alertBox = document.getElementById("budgetAlert");
+
 
 if (budget <= 0) {
 
@@ -322,6 +381,7 @@ alertBox.textContent = "💰 Please set your budget.";
 else {
 
 let percentage = (totalSpent / budget) * 100;
+
 
 if (percentage > 100) {
 
@@ -354,6 +414,7 @@ Math.round(percentage) +
 let list = document.getElementById("expenseList");
 
 list.innerHTML = "";
+
 
 expenses.forEach(function(expense, index) {
 
@@ -396,3 +457,114 @@ remaining +
 }
 
 
+if (savingsGoal <= 0) {
+
+document.getElementById("goalMessage").textContent =
+"No savings goal set yet.";
+
+}
+
+else if (remaining >= savingsGoal) {
+
+document.getElementById("goalMessage").textContent =
+"🎉 Great! You can reach your savings goal of Rs. " +
+savingsGoal +
+".";
+
+}
+
+else {
+
+document.getElementById("goalMessage").textContent =
+"🎯 Savings Goal: Rs. " +
+savingsGoal +
+". You need more savings to reach it.";
+
+}
+
+
+updateChart();
+
+}
+
+
+function updateChart() {
+
+let totals = {};
+
+
+expenses.forEach(function(expense) {
+
+if (totals[expense.category]) {
+
+totals[expense.category] += expense.amount;
+
+}
+
+else {
+
+totals[expense.category] = expense.amount;
+
+}
+
+});
+
+
+let labels = Object.keys(totals);
+
+let data = Object.values(totals);
+
+let ctx = document.getElementById("expenseChart");
+
+
+if (expenseChart) {
+
+expenseChart.destroy();
+
+}
+
+
+if (labels.length === 0) {
+
+return;
+
+}
+
+
+expenseChart = new Chart(ctx, {
+
+type: "doughnut",
+
+data: {
+
+labels: labels,
+
+datasets: [{
+
+data: data
+
+}]
+
+},
+
+options: {
+
+responsive: true
+
+}
+
+});
+
+}
+
+
+document.getElementById("budget").value = budget || "";
+
+document.getElementById("savingsGoal").value = savingsGoal || "";
+
+updateScreen();
+
+</script>
+
+</body>
+</html>
