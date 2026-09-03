@@ -3,7 +3,6 @@
 <head>
     <title>AI Budget Buddy</title>
     <link rel="stylesheet" href="style.css">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -46,13 +45,44 @@
 
     <div class="card">
 
+        <h2>🎯 Savings Goal</h2>
+
+        <input
+            type="number"
+            id="savingsGoal"
+            placeholder="Enter savings goal"
+        >
+
+        <button onclick="setSavingsGoal()">
+            Set Savings Goal
+        </button>
+
+        <p id="goalMessage">
+            No savings goal set yet.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
         <h2>Daily Expense Tracker</h2>
 
-        <input type="number" id="expense" placeholder="Enter amount">
+        <input
+            type="number"
+            id="expense"
+            placeholder="Enter amount"
+        >
 
-        <input type="text" id="category" placeholder="Food, Travel, etc.">
+        <input
+            type="text"
+            id="category"
+            placeholder="Food, Travel, etc."
+        >
 
-        <button onclick="addExpense()">Add Expense</button>
+        <button onclick="addExpense()">
+            Add Expense
+        </button>
 
         <h3>My Expenses</h3>
 
@@ -76,10 +106,14 @@
 
 <script>
 
-let budget = Number(localStorage.getItem("budget")) || 0;
+let budget =
+    Number(localStorage.getItem("budget")) || 0;
 
 let expenses =
     JSON.parse(localStorage.getItem("expenses")) || [];
+
+let savingsGoal =
+    Number(localStorage.getItem("savingsGoal")) || 0;
 
 let expenseChart;
 
@@ -91,6 +125,11 @@ function saveData() {
     localStorage.setItem(
         "expenses",
         JSON.stringify(expenses)
+    );
+
+    localStorage.setItem(
+        "savingsGoal",
+        savingsGoal
     );
 
 }
@@ -117,6 +156,29 @@ function setBudget() {
 }
 
 
+function setSavingsGoal() {
+
+    const value =
+        Number(
+            document.getElementById("savingsGoal").value
+        );
+
+    if (value <= 0) {
+
+        alert("Please enter a valid savings goal.");
+
+        return;
+    }
+
+    savingsGoal = value;
+
+    saveData();
+
+    updateScreen();
+
+}
+
+
 function addExpense() {
 
     const amount =
@@ -128,7 +190,9 @@ function addExpense() {
 
     if (amount <= 0 || category === "") {
 
-        alert("Please enter expense amount and category.");
+        alert(
+            "Please enter expense amount and category."
+        );
 
         return;
     }
@@ -221,6 +285,63 @@ function showSuggestion() {
 }
 
 
+function updateGoal() {
+
+    const goalMessage =
+        document.getElementById("goalMessage");
+
+
+    if (savingsGoal <= 0) {
+
+        goalMessage.textContent =
+            "No savings goal set yet.";
+
+        return;
+
+    }
+
+
+    const totalSpent =
+        expenses.reduce(
+            function(total, expense) {
+
+                return total + expense.amount;
+
+            },
+            0
+        );
+
+
+    const remaining =
+        budget - totalSpent;
+
+
+    if (remaining >= savingsGoal) {
+
+        goalMessage.textContent =
+            "🎉 Great! You can reach your savings goal of Rs. " +
+            savingsGoal +
+            " with your remaining budget.";
+
+    }
+
+    else {
+
+        const needed =
+            savingsGoal - Math.max(remaining, 0);
+
+        goalMessage.textContent =
+            "🎯 Savings Goal: Rs. " +
+            savingsGoal +
+            ". You need Rs. " +
+            needed +
+            " more to reach it.";
+
+    }
+
+}
+
+
 function updateChart() {
 
     const categoryTotals = {};
@@ -230,9 +351,12 @@ function updateChart() {
 
         if (categoryTotals[expense.category]) {
 
-            categoryTotals[expense.category] += expense.amount;
+            categoryTotals[expense.category] +=
+                expense.amount;
 
-        } else {
+        }
+
+        else {
 
             categoryTotals[expense.category] =
                 expense.amount;
@@ -343,6 +467,8 @@ function updateScreen() {
 
     showSuggestion();
 
+    updateGoal();
+
     updateChart();
 
 }
@@ -350,6 +476,10 @@ function updateScreen() {
 
 document.getElementById("budget").value =
     budget || "";
+
+
+document.getElementById("savingsGoal").value =
+    savingsGoal || "";
 
 
 updateScreen();
