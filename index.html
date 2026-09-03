@@ -1,31 +1,111 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html>
 <head>
     <title>AI Budget Buddy</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css">
+</head><body><div class="container">
 
-    <h1>AI Budget Buddy</h1>
+    <h1>💰 AI Budget Buddy</h1>
+    <p class="subtitle">Smartly manage your daily expenses, budget and savings.</p>
 
-    <p>Smartly manage your daily expenses, budget and savings.</p>
+    <div class="card">
+        <h2>My Budget</h2>
 
-    <h2>Daily Expense Tracker</h2>
+        <input type="number" id="budget" placeholder="Enter your budget">
 
-    <label>Expense:</label>
-    <input type="number" placeholder="Enter amount">
+        <button onclick="setBudget()">Set Budget</button>
 
-    <br><br>
+        <div class="summary">
+            <p>Budget: <strong>Rs. <span id="budgetAmount">0</span></strong></p>
+            <p>Spent: <strong>Rs. <span id="totalSpent">0</span></strong></p>
+            <p>Remaining: <strong>Rs. <span id="remaining">0</span></strong></p>
+        </div>
+    </div>
 
-    <label>Category:</label>
-    <input type="text" placeholder="Food, Travel, etc.">
+    <div class="card">
+        <h2>Daily Expense Tracker</h2>
 
-    <br><br>
+        <input type="number" id="expense" placeholder="Enter amount">
 
-    <button>Add Expense</button>
+        <input type="text" id="category" placeholder="Food, Travel, etc.">
 
-    <h2>My Budget</h2>
-    <p>Track your spending and improve your savings.</p>
+        <button onclick="addExpense()">Add Expense</button>
+
+        <h3>My Expenses</h3>
+
+        <ul id="expenseList"></ul>
+    </div>
+
+</div>
+
+<script>
+
+    let budget = 0;
+    let totalSpent = 0;
+
+    function setBudget() {
+
+        budget = Number(document.getElementById("budget").value);
+
+        if (budget <= 0) {
+            alert("Please enter a valid budget.");
+            return;
+        }
+
+        document.getElementById("budgetAmount").textContent = budget;
+
+        updateBalance();
+    }
+
+    function addExpense() {
+
+        const expenseInput = document.getElementById("expense");
+        const categoryInput = document.getElementById("category");
+
+        const amount = Number(expenseInput.value);
+        const category = categoryInput.value.trim();
+
+        if (amount <= 0 || category === "") {
+            alert("Please enter expense amount and category.");
+            return;
+        }
+
+        totalSpent += amount;
+
+        const list = document.getElementById("expenseList");
+
+        const item = document.createElement("li");
+
+        item.innerHTML =
+            category + " - Rs. " + amount +
+            ' <button onclick="deleteExpense(this, ' + amount + ')">Delete</button>';
+
+        list.appendChild(item);
+
+        expenseInput.value = "";
+        categoryInput.value = "";
+
+        updateBalance();
+    }
+
+    function deleteExpense(button, amount) {
+
+        totalSpent -= amount;
+
+        button.parentElement.remove();
+
+        updateBalance();
+    }
+
+    function updateBalance() {
+
+        document.getElementById("totalSpent").textContent = totalSpent;
+
+        const remaining = budget - totalSpent;
+
+        document.getElementById("remaining").textContent = remaining;
+    }
+
+</script>
 
 </body>
 </html>
