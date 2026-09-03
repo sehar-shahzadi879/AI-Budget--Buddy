@@ -71,25 +71,43 @@ button:hover {
     opacity: 0.9;
 }
 
-#budgetAlert {
+#budgetAlert,
+#suggestion,
+#goalMessage {
     padding: 12px;
     border-radius: 10px;
+    line-height: 1.5;
+}
+
+#budgetAlert {
     background: #eef2ff;
     text-align: center;
 }
 
 #suggestion {
-    padding: 12px;
-    border-radius: 10px;
     background: #fff8df;
-    line-height: 1.5;
 }
 
 #goalMessage {
-    padding: 12px;
-    border-radius: 10px;
     background: #eefbf3;
-    line-height: 1.5;
+}
+
+.progress-container {
+    width: 100%;
+    background: #eeeeee;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 12px;
+}
+
+#savingsProgress {
+    width: 0%;
+    background: #667eea;
+    color: white;
+    text-align: center;
+    padding: 9px 0;
+    font-weight: bold;
+    transition: width 0.5s;
 }
 
 ul {
@@ -166,6 +184,10 @@ Smartly manage your daily expenses, budget and savings.
 <button onclick="setSavingsGoal()">Set Savings Goal</button>
 
 <p id="goalMessage">No savings goal set yet.</p>
+
+<div class="progress-container">
+    <div id="savingsProgress">0%</div>
+</div>
 
 </div>
 
@@ -492,6 +514,29 @@ document.getElementById("suggestion").textContent =
 }
 
 
+/* 🎯 Savings Progress */
+
+let progress = 0;
+
+if (savingsGoal > 0 && remaining > 0) {
+
+progress = (remaining / savingsGoal) * 100;
+
+if (progress > 100) {
+
+progress = 100;
+
+}
+
+}
+
+let progressBar = document.getElementById("savingsProgress");
+
+progressBar.style.width = progress + "%";
+
+progressBar.textContent = Math.round(progress) + "%";
+
+
 if (savingsGoal <= 0) {
 
 document.getElementById("goalMessage").textContent =
@@ -510,10 +555,14 @@ savingsGoal +
 
 else {
 
+let needed = savingsGoal - Math.max(remaining, 0);
+
 document.getElementById("goalMessage").textContent =
 "🎯 Savings Goal: Rs. " +
 savingsGoal +
-". You need more savings to reach it.";
+". You need Rs. " +
+needed +
+" more to reach your goal.";
 
 }
 
