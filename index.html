@@ -2,119 +2,281 @@
 <head>
     <title>AI Budget Buddy</title>
     <link rel="stylesheet" href="style.css">
-</head><body>
-<div class="container"><h1>💰 AI Budget Buddy</h1>
-<p class="subtitle">Smartly manage your daily expenses, budget and savings.</p>
+</head><body><div class="container"><h1>💰 AI Budget Buddy</h1>
+
+<p class="subtitle">
+    Smartly manage your daily expenses, budget and savings.
+</p>
 
 <div class="card">
+
     <h2>My Budget</h2>
 
-    <input type="number" id="budget" placeholder="Enter your budget">
+    <input
+        type="number"
+        id="budget"
+        placeholder="Enter your budget"
+    >
+
     <button onclick="setBudget()">Set Budget</button>
 
     <div class="summary">
-        <p>Budget: <strong>Rs. <span id="budgetAmount">0</span></strong></p>
-        <p>Spent: <strong>Rs. <span id="totalSpent">0</span></strong></p>
-        <p>Remaining: <strong>Rs. <span id="remaining">0</span></strong></p>
+
+        <p>
+            Budget:
+            <strong>Rs. <span id="budgetAmount">0</span></strong>
+        </p>
+
+        <p>
+            Spent:
+            <strong>Rs. <span id="totalSpent">0</span></strong>
+        </p>
+
+        <p>
+            Remaining:
+            <strong>Rs. <span id="remaining">0</span></strong>
+        </p>
+
     </div>
+
 </div>
 
+
 <div class="card">
+
     <h2>Daily Expense Tracker</h2>
 
-    <input type="number" id="expense" placeholder="Enter amount">
-    <input type="text" id="category" placeholder="Food, Travel, etc.">
+    <input
+        type="number"
+        id="expense"
+        placeholder="Enter amount"
+    >
+
+    <input
+        type="text"
+        id="category"
+        placeholder="Food, Travel, etc."
+    >
 
     <button onclick="addExpense()">Add Expense</button>
 
     <h3>My Expenses</h3>
+
     <ul id="expenseList"></ul>
+
+    <div id="suggestion" class="suggestion"></div>
+
 </div>
 
 </div><script>
 
 let budget = Number(localStorage.getItem("budget")) || 0;
-let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+
+let expenses =
+    JSON.parse(localStorage.getItem("expenses")) || [];
+
 
 function saveData() {
+
     localStorage.setItem("budget", budget);
-    localStorage.setItem("expenses", JSON.stringify(expenses));
+
+    localStorage.setItem(
+        "expenses",
+        JSON.stringify(expenses)
+    );
+
 }
+
 
 function setBudget() {
 
-    const value = Number(document.getElementById("budget").value);
+    const value =
+        Number(document.getElementById("budget").value);
 
     if (value <= 0) {
+
         alert("Please enter a valid budget.");
+
         return;
     }
 
     budget = value;
+
     saveData();
+
     updateScreen();
+
 }
+
 
 function addExpense() {
 
-    const amount = Number(document.getElementById("expense").value);
-    const category = document.getElementById("category").value.trim();
+    const amount =
+        Number(document.getElementById("expense").value);
+
+    const category =
+        document.getElementById("category").value.trim();
+
 
     if (amount <= 0 || category === "") {
-        alert("Please enter expense amount and category.");
+
+        alert(
+            "Please enter expense amount and category."
+        );
+
         return;
     }
 
+
     expenses.push({
+
         amount: amount,
+
         category: category
+
     });
+
 
     saveData();
 
+
     document.getElementById("expense").value = "";
+
     document.getElementById("category").value = "";
 
+
     updateScreen();
+
 }
+
 
 function deleteExpense(index) {
 
     expenses.splice(index, 1);
 
     saveData();
+
     updateScreen();
+
 }
+
+
+function showSuggestion() {
+
+    const suggestion =
+        document.getElementById("suggestion");
+
+
+    const totalSpent =
+        expenses.reduce(
+            function(total, expense) {
+
+                return total + expense.amount;
+
+            },
+            0
+        );
+
+
+    const remaining =
+        budget - totalSpent;
+
+
+    if (budget <= 0) {
+
+        suggestion.textContent =
+            "💡 Set a budget to get smart saving suggestions.";
+
+    }
+
+    else if (remaining < 0) {
+
+        suggestion.textContent =
+            "⚠️ You have exceeded your budget. Try to reduce unnecessary expenses.";
+
+    }
+
+    else if (remaining <= budget * 0.2) {
+
+        suggestion.textContent =
+            "⚠️ Your budget is almost finished. Try to control your spending.";
+
+    }
+
+    else {
+
+        suggestion.textContent =
+            "💡 Great! You have Rs. " +
+            remaining +
+            " remaining. Keep saving and avoid unnecessary expenses.";
+
+    }
+
+}
+
 
 function updateScreen() {
 
-    document.getElementById("budgetAmount").textContent = budget;
+    document.getElementById("budgetAmount").textContent =
+        budget;
 
-    const totalSpent = expenses.reduce(function(total, expense) {
-        return total + expense.amount;
-    }, 0);
 
-    document.getElementById("totalSpent").textContent = totalSpent;
-    document.getElementById("remaining").textContent = budget - totalSpent;
+    const totalSpent =
+        expenses.reduce(
+            function(total, expense) {
 
-    const list = document.getElementById("expenseList");
+                return total + expense.amount;
+
+            },
+            0
+        );
+
+
+    document.getElementById("totalSpent").textContent =
+        totalSpent;
+
+
+    document.getElementById("remaining").textContent =
+        budget - totalSpent;
+
+
+    const list =
+        document.getElementById("expenseList");
+
+
     list.innerHTML = "";
 
-    expenses.forEach(function(expense, index) {
 
-        const item = document.createElement("li");
+    expenses.forEach(
+        function(expense, index) {
 
-        item.innerHTML =
-            expense.category +
-            " - Rs. " +
-            expense.amount +
-            ' <button onclick="deleteExpense(' + index + ')">Delete</button>';
+            const item =
+                document.createElement("li");
 
-        list.appendChild(item);
-    });
+
+            item.innerHTML =
+                expense.category +
+                " - Rs. " +
+                expense.amount +
+                ' <button onclick="deleteExpense(' +
+                index +
+                ')">Delete</button>';
+
+
+            list.appendChild(item);
+
+        }
+    );
+
+
+    showSuggestion();
+
 }
 
-document.getElementById("budget").value = budget || "";
+
+document.getElementById("budget").value =
+    budget || "";
+
 
 updateScreen();
 
